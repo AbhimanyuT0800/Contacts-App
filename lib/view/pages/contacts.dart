@@ -1,5 +1,6 @@
 import 'package:contact_with_object_box/controller/contact_provider.dart';
 import 'package:contact_with_object_box/model/contact_model.dart';
+import 'package:contact_with_object_box/view/widgets/add_contact_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,7 +21,7 @@ class ContactPage extends ConsumerWidget {
         ),
       ),
       body: contactList.isEmpty
-          ? Center(
+          ? const Center(
               child: Text('No Contacts'),
             )
           : Expanded(
@@ -100,60 +101,7 @@ class ContactPage extends ConsumerWidget {
               },
             );
           },
-          label: Text('Add contact')),
+          label: const Text('Add contact')),
     );
-  }
-}
-
-class ModelBottomSheet extends StatelessWidget {
-  const ModelBottomSheet({
-    super.key,
-    required this.formKey,
-    required this.name,
-    required this.phone,
-    required this.ref,
-    required this.onPressed,
-  });
-  final WidgetRef ref;
-  final TextEditingController name;
-  final TextEditingController phone;
-  final GlobalKey<FormState> formKey;
-  final Function() onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-        key: formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            TextFormField(
-              controller: name,
-            ),
-            TextFormField(
-              controller: phone,
-            ),
-            Row(
-              children: [
-                Spacer(),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    name.clear();
-                    phone.clear();
-                  },
-                  child: Text('cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: onPressed,
-                  child: Text('add'),
-                ),
-                SizedBox(
-                  width: 20,
-                )
-              ],
-            )
-          ],
-        ));
   }
 }
