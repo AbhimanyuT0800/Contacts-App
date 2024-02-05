@@ -1,107 +1,119 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ModelBottomSheet extends StatelessWidget {
-  const ModelBottomSheet({
-    super.key,
-    required this.formKey,
-    required this.name,
-    required this.phone,
-    required this.ref,
-    required this.onPressed,
-  });
-  final WidgetRef ref;
-  final TextEditingController name;
-  final TextEditingController phone;
-  final GlobalKey<FormState> formKey;
-  final Function() onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 30,
-        ),
-        child: Form(
-            key: formKey,
-            child: Padding(
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const SizedBox(
-                    height: 50,
+Padding localBottomSheet({
+  required BuildContext context,
+  required GlobalKey<FormState> formKey,
+  required TextEditingController name,
+  required TextEditingController phone,
+  required WidgetRef ref,
+  required Function() onPressed,
+  required bool isEdit,
+}) {
+  return Padding(
+    padding: EdgeInsets.only(
+      bottom: MediaQuery.of(context).viewInsets.bottom,
+      left: 30,
+      right: 30,
+    ),
+    child: Form(
+      key: formKey,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            const SizedBox(
+              height: 50,
+            ),
+            TextFormField(
+              controller: name,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Name cannot be empty';
+                }
+                return null;
+              },
+              onChanged: (value) => name.text = value,
+              decoration: InputDecoration(
+                hintText: 'Enter your name',
+                labelText: 'Name',
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(
+                    color: Colors.grey,
                   ),
-                  TextFormField(
-                    textInputAction: TextInputAction.go,
-                    decoration: InputDecoration(
-                      hintText: 'Enter your name',
-                      labelText: 'Name',
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: Colors.grey,
-                          ),
-                          borderRadius: BorderRadius.circular(20)),
-                      errorBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.red),
-                          borderRadius: BorderRadius.circular(20)),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.blue),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    controller: name,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    controller: phone,
-                    decoration: InputDecoration(
-                      hintText: 'Enter phone number',
-                      labelText: 'Phone',
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: Colors.grey,
-                          ),
-                          borderRadius: BorderRadius.circular(20)),
-                      errorBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.red),
-                          borderRadius: BorderRadius.circular(20)),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.blue),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      const Spacer(),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          name.clear();
-                          phone.clear();
-                        },
-                        child: const Text('cancel'),
-                      ),
-                      ElevatedButton(
-                        onPressed: onPressed,
-                        child: const Text('add'),
-                      ),
-                    ],
-                  )
-                ],
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                errorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.red),
+                    borderRadius: BorderRadius.circular(20)),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blue),
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
-            )),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            TextFormField(
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              controller: phone,
+              validator: (value) {
+                RegExp regx = RegExp(r'^(?:[+0]9)?[0-9]{10}$');
+                if (value == null || value.isEmpty) {
+                  return 'Phone Number cannot be empty';
+                } else if (!regx.hasMatch(value)) {
+                  return 'Enter a valid phone number';
+                }
+                return null;
+              },
+              onChanged: (value) => phone.text = value,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                hintText: 'Enter phone number',
+                labelText: 'Phone',
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Colors.grey,
+                    ),
+                    borderRadius: BorderRadius.circular(20)),
+                errorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.red),
+                    borderRadius: BorderRadius.circular(20)),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blue),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                const Spacer(),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    name.clear();
+                    phone.clear();
+                  },
+                  child: const Text('cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      onPressed();
+                    }
+                  },
+                  child: const Text('add'),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
 }

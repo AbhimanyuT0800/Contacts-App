@@ -1,0 +1,46 @@
+ Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // edit-method
+                      IconButton(
+                        onPressed: () {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                name.text = contactList[index].name;
+                                phone.text = contactList[index].phone;
+                                return localBottomSheet(
+                                    formKey: formKey,
+                                    name: name,
+                                    phone: phone,
+                                    ref: ref,
+                                    onPressed: () {
+                                      final ContactEntity contact =
+                                          ContactEntity(
+                                        id: contactList[index].id,
+                                        name: name.text,
+                                        phone: phone.text,
+                                      );
+                                      ref
+                                          .watch(contactProvider.notifier)
+                                          .putContact(contact);
+                                      Navigator.pop(context);
+                                      name.clear();
+                                      phone.clear();
+                                    },
+                                    context: context,
+                                    isEdit: true);
+                              });
+                        },
+                        icon: const Icon(Icons.edit),
+                      ),
+                      // delete-method
+                      IconButton(
+                          onPressed: () {
+                            ref
+                                .watch(contactProvider.notifier)
+                                .removeContact(contactList[index].id);
+                          },
+                          icon: const Icon(Icons.delete_forever_sharp))
+                    ],
+                  ),

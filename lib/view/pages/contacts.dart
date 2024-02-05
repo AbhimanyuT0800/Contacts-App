@@ -12,8 +12,8 @@ class ContactPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final List<ContactEntity> contactList =
-        ref.watch(contactProvider) as List<ContactEntity>;
+    final List<ContactEntity> contactList = ref.watch(contactProvider);
+    print(contactList.length);
     return Scaffold(
       appBar: AppBar(
         title: const Center(
@@ -24,67 +24,87 @@ class ContactPage extends ConsumerWidget {
           ? const Center(
               child: Text('No Contacts'),
             )
-          : Expanded(
-              child: ListView.builder(
-                itemCount: contactList.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(contactList[index].name),
+          : ListView.builder(
+              shrinkWrap: true,
+              itemCount: contactList.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                    title: Text(
+                      contactList[index].name,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w700),
+                    ),
                     subtitle: Text(contactList[index].phone),
                     leading: CircleAvatar(
-                      child: Text(contactList[index].name[0]),
+                      child: Text(
+                        contactList[index].name[0].toUpperCase(),
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w800),
+                      ),
                     ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            showModalBottomSheet(
-                                context: context,
-                                builder: (context) {
-                                  name.text = contactList[index].name;
-                                  phone.text = contactList[index].phone;
-                                  return ModelBottomSheet(
-                                      formKey: formKey,
-                                      name: name,
-                                      phone: phone,
-                                      ref: ref,
-                                      onPressed: () {
-                                        final ContactEntity contact =
-                                            ContactEntity(
-                                                id: contactList[index].id,
-                                                name: name.text,
-                                                phone: phone.text);
-                                        ref
-                                            .watch(contactProvider.notifier)
-                                            .putContact(contact);
-                                        Navigator.pop(context);
-                                        name.clear();
-                                        phone.clear();
-                                      });
-                                });
-                          },
-                          icon: const Icon(Icons.edit),
+                    trailing: PopupMenuButton(itemBuilder: (context) {
+                      return [
+                        // Edit Contact
+                        PopupMenuItem<int>(
+                          child: TextButton(
+                              onPressed: () {
+                                name.text = contactList[index].name;
+                                phone.text = contactList[index].phone;
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return localBottomSheet(
+                                        formKey: formKey,
+                                        name: name,
+                                        phone: phone,
+                                        ref: ref,
+                                        onPressed: () {
+                                          final ContactEntity contact =
+                                              ContactEntity(
+                                            id: contactList[index].id,
+                                            name: name.text,
+                                            phone: phone.text,
+                                          );
+                                          ref
+                                              .watch(contactProvider.notifier)
+                                              .putContact(contact);
+                                          Navigator.pop(context);
+                                          name.clear();
+                                          phone.clear();
+                                        },
+                                        context: context,
+                                        isEdit: true);
+                                  },
+                                );
+                              },
+                              child: const Text('Edit')),
                         ),
-                        IconButton(
+                        // delete contact
+                        PopupMenuItem(
+                          child: TextButton(
                             onPressed: () {
                               ref
                                   .watch(contactProvider.notifier)
                                   .removeContact(contactList[index].id);
+                              Navigator.pop(context);
                             },
-                            icon: const Icon(Icons.delete_forever_sharp))
-                      ],
-                    ),
-                  );
-                },
-              ),
+                            child: const Text('Delete'),
+                          ),
+                        )
+                      ];
+                    }));
+              },
             ),
+      // add-contacts
       floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
+            phone.clear();
+            name.clear();
+
             showModalBottomSheet(
               context: context,
               builder: (context) {
-                return ModelBottomSheet(
+                return localBottomSheet(
                   onPressed: () {
                     final ContactEntity contact =
                         ContactEntity(name: name.text, phone: phone.text);
@@ -97,6 +117,8 @@ class ContactPage extends ConsumerWidget {
                   formKey: formKey,
                   name: name,
                   phone: phone,
+                  context: context,
+                  isEdit: false,
                 );
               },
             );
