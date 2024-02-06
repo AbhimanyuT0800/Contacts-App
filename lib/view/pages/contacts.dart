@@ -9,17 +9,48 @@ class ContactPage extends ConsumerWidget {
   final TextEditingController name = TextEditingController();
   final TextEditingController phone = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey();
+  final TextEditingController search = TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final List<ContactEntity> contactList = ref.watch(contactProvider);
-    print(contactList.length);
+    final List<ContactEntity> contactList =
+        ref.watch(contactProvider(search.text));
     return Scaffold(
       appBar: AppBar(
-        title: Center(
-          child: Text('Contacts'),
-        ),
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.search))],
+        title: AnimatedCrossFade(
+            firstChild: const Center(
+              child: Text('Contacts'),
+            ),
+            secondChild: TextField(
+              controller: search,
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                hintText: "Search contacts",
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    search.clear();
+                  },
+                  icon: const Icon(Icons.clear),
+                ),
+              ),
+              onChanged: (value) {
+                ref.invalidate(
+                  contactProvider(search.text),
+                );
+              },
+            ),
+            crossFadeState: ref.watch(isSearch)
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            duration: const Duration(milliseconds: 300)),
+        actions: [
+          IconButton(
+              onPressed: () {
+                ref.watch(isSearch.notifier).state = !ref.read(isSearch);
+              },
+              icon: const Icon(Icons.search))
+        ],
       ),
       body: contactList.isEmpty
           ? const Center(
@@ -67,7 +98,9 @@ class ContactPage extends ConsumerWidget {
                                             phone: phone.text,
                                           );
                                           ref
-                                              .watch(contactProvider.notifier)
+                                              .watch(
+                                                  contactProvider(search.text)
+                                                      .notifier)
                                               .putContact(contact);
                                           Navigator.pop(context);
                                           name.clear();
@@ -85,7 +118,7 @@ class ContactPage extends ConsumerWidget {
                           child: TextButton(
                             onPressed: () {
                               ref
-                                  .watch(contactProvider.notifier)
+                                  .watch(contactProvider(search.text).notifier)
                                   .removeContact(contactList[index].id);
                               Navigator.pop(context);
                             },
@@ -109,7 +142,9 @@ class ContactPage extends ConsumerWidget {
                   onPressed: () {
                     final ContactEntity contact =
                         ContactEntity(name: name.text, phone: phone.text);
-                    ref.watch(contactProvider.notifier).putContact(contact);
+                    ref
+                        .watch(contactProvider(search.text).notifier)
+                        .putContact(contact);
                     name.clear();
                     phone.clear();
                     Navigator.pop(context);
