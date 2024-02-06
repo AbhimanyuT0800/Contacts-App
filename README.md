@@ -28,7 +28,7 @@ This Flutter application serves as a contact manager, allowing users to efficien
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-username/flutter-contact-manager.git
+   git clone https://github.com/AbhimanyuT0800/Flutter-Contact_Manager.git
 2. **Install dependencies:**
 
    ```bash

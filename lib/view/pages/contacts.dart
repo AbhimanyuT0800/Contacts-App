@@ -16,9 +16,10 @@ class ContactPage extends ConsumerWidget {
     print(contactList.length);
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
+        title: Center(
           child: Text('Contacts'),
         ),
+        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.search))],
       ),
       body: contactList.isEmpty
           ? const Center(
