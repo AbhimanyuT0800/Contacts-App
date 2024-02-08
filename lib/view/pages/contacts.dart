@@ -1,4 +1,5 @@
 import 'package:contact_with_object_box/controller/contact_provider.dart';
+import 'package:contact_with_object_box/controller/theme_provider.dart';
 import 'package:contact_with_object_box/model/contact_model.dart';
 import 'package:contact_with_object_box/view/widgets/add_contact_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -35,9 +36,8 @@ class ContactPage extends ConsumerWidget {
                 ),
               ),
               onChanged: (value) {
-                ref.invalidate(
-                  contactProvider(search.text),
-                );
+                print('object');
+                ref.watch(ContactProvider(value));
               },
             ),
             crossFadeState: ref.watch(isSearch)
@@ -46,10 +46,19 @@ class ContactPage extends ConsumerWidget {
             duration: const Duration(milliseconds: 300)),
         actions: [
           IconButton(
+            onPressed: () {
+              ref.watch(isSearch.notifier).state = !ref.read(isSearch);
+            },
+            icon: const Icon(Icons.search),
+          ),
+          IconButton(
               onPressed: () {
-                ref.watch(isSearch.notifier).state = !ref.read(isSearch);
+                ref.read(themeProvider.notifier).setTheme();
+                // ref.watch(themeProvider.notifier).setIsDark(ref.read(themeProvider));
               },
-              icon: const Icon(Icons.search))
+              icon: ref.read(themeProvider)!
+                  ? const Icon(Icons.dark_mode)
+                  : Icon(Icons.light_mode_outlined))
         ],
       ),
       body: contactList.isEmpty

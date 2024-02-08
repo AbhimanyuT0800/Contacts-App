@@ -10,14 +10,32 @@ class Contact extends _$Contact {
   @override
   List<ContactEntity> build(String search) {
     // return ContactServices.contactBox.getAll();
-    return sortedList(search);
+    return currentList(search);
+  }
+
+  List<ContactEntity> currentList(String str) {
+    if (str.isNotEmpty) {
+      List<ContactEntity> localList = sortedList(str);
+      List<ContactEntity> list = [
+        for (ContactEntity model in localList)
+          if (model.name.startsWith(str)) model
+      ];
+      return list;
+    } else {
+      return sortedList('');
+    }
   }
 
   List<ContactEntity> sortedList(String search) {
     final Query<ContactEntity> query = ContactServices.contactBox
-        .query(search.isEmpty ? null : ContactEntity_.name.contains(search))
-        .order(ContactEntity_.name)
+        .query(search.isEmpty ? null : ContactEntity_.name.startsWith(search))
+        .order(
+          ContactEntity_.name,
+        )
         .build();
+    // final PropertyQuery<String> pq = query.property(ContactEntity_.name);
+    // pq.distinct = true;
+
     return query.find();
   }
 
