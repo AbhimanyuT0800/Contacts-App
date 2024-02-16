@@ -15,6 +15,6 @@ class LocalSharePrefarences {
   }
 
   static bool getPref() {
-    return pref.getBool('theme')!;
+    return pref.getBool('theme') ?? false;
   }
 }

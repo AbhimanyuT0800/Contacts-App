@@ -6,7 +6,7 @@ part of 'contact_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$contactHash() => r'813ba4e46deb4c7200d197de40d5c91a71adc547';
+String _$contactHash() => r'3dedb865577fa0f3e0c0c38222af90fd7bdc3324';
 
 /// Copied from Dart SDK
 class _SystemHash {

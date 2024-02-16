@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ContactPage extends ConsumerWidget {
   ContactPage({super.key});
+  // controllers
   final TextEditingController name = TextEditingController();
   final TextEditingController phone = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey();
@@ -14,10 +15,12 @@ class ContactPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // List of contacts from Object-box
     final List<ContactEntity> contactList =
         ref.watch(contactProvider(search.text));
     return Scaffold(
       appBar: AppBar(
+        // Animated search bar
         title: AnimatedCrossFade(
             firstChild: const Center(
               child: Text('Contacts'),
@@ -36,7 +39,6 @@ class ContactPage extends ConsumerWidget {
                 ),
               ),
               onChanged: (value) {
-                print('object');
                 ref.watch(ContactProvider(value));
               },
             ),
@@ -51,20 +53,22 @@ class ContactPage extends ConsumerWidget {
             },
             icon: const Icon(Icons.search),
           ),
+          // Theme-controller btn
           IconButton(
               onPressed: () {
                 ref.read(themeProvider.notifier).setTheme();
-                // ref.watch(themeProvider.notifier).setIsDark(ref.read(themeProvider));
               },
               icon: ref.read(themeProvider)!
                   ? const Icon(Icons.dark_mode)
-                  : Icon(Icons.light_mode_outlined))
+                  : const Icon(Icons.light_mode_outlined))
         ],
       ),
       body: contactList.isEmpty
+          // if object-box is empty
           ? const Center(
               child: Text('No Contacts'),
             )
+          // if Object-box has atleast one contact
           : ListView.builder(
               shrinkWrap: true,
               itemCount: contactList.length,
@@ -85,7 +89,7 @@ class ContactPage extends ConsumerWidget {
                     ),
                     trailing: PopupMenuButton(itemBuilder: (context) {
                       return [
-                        // Edit Contact
+                        // Edit ContactEntity
                         PopupMenuItem<int>(
                           child: TextButton(
                               onPressed: () {
@@ -138,7 +142,7 @@ class ContactPage extends ConsumerWidget {
                     }));
               },
             ),
-      // add-contacts
+      // add-more-contacts
       floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             phone.clear();
@@ -147,7 +151,14 @@ class ContactPage extends ConsumerWidget {
             showModalBottomSheet(
               context: context,
               builder: (context) {
+                // bottom sheet for enter contact info
                 return localBottomSheet(
+                  ref: ref,
+                  formKey: formKey,
+                  name: name,
+                  phone: phone,
+                  context: context,
+                  isEdit: false,
                   onPressed: () {
                     final ContactEntity contact =
                         ContactEntity(name: name.text, phone: phone.text);
@@ -158,12 +169,6 @@ class ContactPage extends ConsumerWidget {
                     phone.clear();
                     Navigator.pop(context);
                   },
-                  ref: ref,
-                  formKey: formKey,
-                  name: name,
-                  phone: phone,
-                  context: context,
-                  isEdit: false,
                 );
               },
             );

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
+  // ensure the creation of Object-box & SharePref
   WidgetsFlutterBinding.ensureInitialized();
   await ContactServices.createBox();
   await LocalSharePrefarences.create();
@@ -22,8 +23,8 @@ class MainApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
+      // Theme-Switcher
       theme: ref.watch(themeProvider)! ? ThemeData.dark() : ThemeData.light(),
-      // ref.read(themeProvider) ? ThemeData.dark() : ThemeData.light(),
       debugShowCheckedModeBanner: false,
       home: ContactPage(),
     );

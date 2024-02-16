@@ -11,7 +11,9 @@ class ContactServices {
   }
   static Future<ContactServices> createBox() async {
     final docdir = await getApplicationDocumentsDirectory();
-    final store = await openStore(directory: join(docdir.path, 'contacts'));
+    final store = await openStore(
+      directory: join(docdir.path, 'contacts'),
+    );
     return ContactServices._create(store);
   }
 }

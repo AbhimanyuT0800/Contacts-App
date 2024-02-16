@@ -10,8 +10,8 @@ class Theme extends _$Theme {
   }
 
   void setTheme() {
-    state = !state!;
+    state = !state;
 
-    LocalSharePrefarences.setPref(state!);
+    LocalSharePrefarences.setPref(state);
   }
 }
